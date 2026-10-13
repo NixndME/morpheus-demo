@@ -1,0 +1,55 @@
+<style>
+/* Morpheus 9 design tokens switch with light and dark mode; the fallbacks keep older themes readable */
+.mdx{--t-text:var(--hpe-color-text-default,inherit);--t-strong:var(--hpe-color-text-strong,inherit);--t-weak:var(--hpe-color-text-weak,#7d8a94);
+ --t-line:var(--hpe-color-border-weak,rgba(125,138,148,.35));--t-front:var(--hpe-color-background-front,transparent);
+ --t-contrast:var(--hpe-color-background-contrast,rgba(125,138,148,.08));--t-brand:var(--hpe-button-primary-rest-background,#01A982);
+ --t-onbrand:var(--hpe-button-primary-rest-textColor,#fff);--t-ok:#17a673;--t-warn:#c7881a;--t-crit:var(--hpe-color-border-critical,#cc1f1a);--t-info:#2f7fc1;
+ color:var(--t-text);font-size:14px;width:100%}
+.mdx *{box-sizing:border-box}
+.mdx-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 18px;padding:14px 18px;border:1px solid var(--t-line);border-radius:12px;background:var(--t-front)}
+.mdx-head h3{margin:0;font-size:20px;font-weight:600;color:var(--t-strong);text-transform:none}
+.mdx-sub{color:var(--t-weak);font-size:13px}
+.mdx-spacer{flex:1}
+.mdx-btn{display:inline-flex;align-items:center;justify-content:center;min-width:96px;height:32px;padding:0 18px;border-radius:9999px;border:1px solid var(--t-line);
+ background:transparent;color:var(--t-text);font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}
+.mdx-btn:hover{border-color:var(--t-brand);color:var(--t-text);text-decoration:none}
+.mdx-btn:disabled{opacity:.55;cursor:default}
+.mdx-btn-primary{background:var(--t-brand);border-color:var(--t-brand);color:var(--t-onbrand)}
+.mdx-btn-primary:hover{color:var(--t-onbrand);filter:brightness(1.08)}
+.mdx-btn-danger{color:var(--t-crit);border-color:var(--t-crit)}
+.mdx-btn-danger:hover{border-color:var(--t-crit);color:var(--t-crit)}
+.mdx-btn-armed{background:var(--t-crit);color:#fff}
+.mdx-btn-armed:hover{color:#fff}
+.mdx-alert{padding:10px 14px;margin:0 0 14px;border-radius:8px;border-left:4px solid var(--t-info);background:var(--t-contrast)}
+.mdx-alert-error{border-left-color:var(--t-crit)}
+.mdx-alert-ok{border-left-color:var(--t-ok)}
+.mdx-result{padding:12px 16px;margin:0 0 18px;border:1px solid var(--t-line);border-radius:12px;background:var(--t-contrast);max-height:340px;overflow-y:auto}
+.mdx-result h5{margin:0 0 8px;font-size:14px;font-weight:600;color:var(--t-strong);text-transform:none}
+.mdx-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:0 0 18px}
+.mdx-kpis-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mdx-kpi{padding:14px 16px;border:1px solid var(--t-line);border-radius:12px;background:var(--t-front);min-height:104px}
+.mdx-kpi-label{font-size:12px;color:var(--t-weak);text-transform:uppercase;letter-spacing:.04em}
+.mdx-kpi-value{font-size:30px;font-weight:600;line-height:1.2;margin:6px 0 2px;color:var(--t-strong)}
+.mdx-kpi-small{font-size:17px;line-height:1.4;margin:10px 0 4px}
+.mdx-kpi-note{font-size:12px;color:var(--t-weak)}
+.mdx-ok{color:var(--t-ok)!important}.mdx-warn{color:var(--t-warn)!important}.mdx-crit{color:var(--t-crit)!important}.mdx-info{color:var(--t-info)!important}.mdx-muted{color:var(--t-weak)}
+.mdx-card{padding:16px 18px;border:1px solid var(--t-line);border-radius:12px;background:var(--t-front);margin:0 0 18px}
+.mdx-card h4{margin:0 0 12px;font-size:15px;font-weight:600;color:var(--t-strong);text-transform:none}
+.mdx-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.mdx-cols .mdx-card{margin:0 0 18px}
+.mdx-line{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--t-line);font-size:13px}
+.mdx-line:last-child{border-bottom:0}
+.mdx-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:24px}
+.mdx-grid .mdx-line:last-child{border-bottom:1px solid var(--t-line)}
+.mdx-dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--t-weak)}
+.mdx-dot-ok{background:var(--t-ok)}.mdx-dot-bad{background:var(--t-crit)}.mdx-dot-warn{background:var(--t-warn)}.mdx-dot-info{background:var(--t-info)}
+.mdx-steps{margin:0;padding-left:20px;line-height:1.9;font-size:13px;list-style:decimal}
+.mdx-steps li{list-style:decimal}
+.mdx-steps b{color:var(--t-strong)}
+.mdx table{width:100%;border-collapse:collapse;font-size:13px}
+.mdx th{text-align:left;font-weight:500;color:var(--t-weak);font-size:12px;padding:6px 8px;border-bottom:1px solid var(--t-line)}
+.mdx td{padding:7px 8px;border-bottom:1px solid var(--t-line);vertical-align:top;color:var(--t-text)}
+/* Morpheus stripes tables; ours stay plain */
+.mdx table tr,.mdx table tbody tr:nth-child(odd),.mdx table tbody tr:nth-child(even),.mdx table th,.mdx table td{background:transparent!important}
+@media (max-width:1300px){.mdx-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.mdx-cols{grid-template-columns:1fr}.mdx-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>

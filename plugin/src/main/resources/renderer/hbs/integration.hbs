@@ -1,0 +1,41 @@
+<div class="mdx" id="mdx-page">
+{{> hbs/styles}}
+<div class="mdx-head">
+  <h3>Morpheus Demo</h3>
+  <span class="mdx-sub">Demo catalog, blueprint, prices and plans on HVM.</span>
+  <span class="mdx-spacer"></span>
+  <button class="mdx-btn mdx-btn-primary" type="button" data-mdx="setup">Set up</button>
+  <button class="mdx-btn" type="button" data-mdx="check">Check</button>
+  <button class="mdx-btn mdx-btn-danger" type="button" data-mdx="remove">Remove</button>
+</div>
+<div class="mdx-result" id="mdx-result" hidden></div>
+{{#if error}}<div class="mdx-alert mdx-alert-error">{{error}}</div>{{/if}}
+
+<div class="mdx-kpis mdx-kpis-3">
+  <div class="mdx-kpi"><div class="mdx-kpi-label">Demo objects</div><div class="mdx-kpi-value {{#if ready}}mdx-ok{{else}}mdx-warn{{/if}}" id="mdx-made">{{made}} of {{total}}</div><div class="mdx-kpi-note">{{#if ready}}Ready to order{{else}}Press Set up{{/if}}</div></div>
+  <div class="mdx-kpi"><div class="mdx-kpi-label">Lab</div><div class="mdx-kpi-value mdx-kpi-small">{{#each lab}}{{#if @first}}{{text}}{{/if}}{{/each}}</div><div class="mdx-kpi-note">HPE VM Essentials</div></div>
+  <div class="mdx-kpi"><div class="mdx-kpi-label">OpsRamp</div><div class="mdx-kpi-value mdx-kpi-small {{#if opsramp.ok}}mdx-ok{{else}}mdx-warn{{/if}}">{{opsramp.text}}</div><div class="mdx-kpi-note">Plugin settings: Administration > Integrations > Plugins</div></div>
+</div>
+
+<div class="mdx-cols">
+  <div class="mdx-card">
+    <h4>Lab</h4>
+    <div id="mdx-lab">{{#each lab}}<div class="mdx-line"><i class="mdx-dot {{#if ok}}mdx-dot-ok{{else}}mdx-dot-bad{{/if}}"></i>{{text}}</div>{{/each}}</div>
+  </div>
+  <div class="mdx-card">
+    <h4>How to show it</h4>
+    <ol class="mdx-steps">
+      <li>Order <b>Demo Two Tier App</b> from Provisioning > Catalog.</li>
+      <li>Approve it on the Demo Apps dashboard or in Operations > Approvals.</li>
+      <li>Watch both VMs build on Operations > Dashboard.</li>
+      <li>Open the web VM's IP: the app shows how the tiers connect.</li>
+      <li>Order <b>Demo Server Issue</b> on a VM, watch the alert in OpsRamp or Grafana, then order it again with Fix everything.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="mdx-card">
+  <h4>What Set up makes</h4>
+  <div class="mdx-grid" id="mdx-objects">{{#each objects}}<div class="mdx-line"><i class="mdx-dot {{#if ok}}mdx-dot-ok{{else}}mdx-dot-bad{{/if}}"></i>{{text}}</div>{{/each}}</div>
+</div>
+</div>

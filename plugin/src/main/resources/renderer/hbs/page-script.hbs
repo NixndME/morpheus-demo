@@ -1,0 +1,85 @@
+<script nonce="{{nonce}}">
+// Morpheus Demo: Set up, Check and Remove on the integration page, results shown in place
+(function () {
+  if (window.morpheusDemoPage) return;
+  window.morpheusDemoPage = true;
+  var P = '/plugin/morpheus-demo/';
+  var CSRF = { header: '{{csrf.header}}', value: '{{csrf.value}}' };
+  var WHAT = { setup: 'Set up', check: 'Check', remove: 'Remove' };
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function line(item) {
+    var d = el('div', 'mdx-line');
+    d.appendChild(el('i', 'mdx-dot ' + (item.ok ? 'mdx-dot-ok' : 'mdx-dot-bad')));
+    d.appendChild(document.createTextNode(item.text));
+    return d;
+  }
+  function fill(box, items) {
+    if (!box) return;
+    box.textContent = '';
+    items.forEach(function (i) { box.appendChild(line(i)); });
+  }
+  function call(action, done) {
+    var h = { Accept: 'application/json' };
+    if (CSRF.value) h[CSRF.header] = CSRF.value;
+    fetch(P + action, { method: action === 'check' ? 'GET' : 'POST', credentials: 'same-origin', headers: h })
+      .then(function (r) { return r.ok ? r.json() : { ok: false, log: [{ ok: false, text: 'The server answered ' + r.status + '. You may need the Morpheus Demo permission.' }] }; })
+      .then(done)
+      .catch(function () { done({ ok: false, log: [{ ok: false, text: 'Could not reach Morpheus. Try again.' }] }); });
+  }
+  // keep the status lists in step after any action
+  function status(page) {
+    call('check', function (r) {
+      var items = r.log || [];
+      var lab = items.slice(0, 4), objects = items.slice(4, items.length - 1);
+      fill(page.querySelector('#mdx-lab'), lab);
+      fill(page.querySelector('#mdx-objects'), objects);
+      var made = objects.filter(function (o) { return o.ok; }).length;
+      var m = page.querySelector('#mdx-made');
+      if (m) { m.textContent = made + ' of ' + objects.length; m.className = 'mdx-kpi-value ' + (made === objects.length ? 'mdx-ok' : 'mdx-warn'); }
+    });
+  }
+  function run(page, btn, action) {
+    var box = page.querySelector('#mdx-result');
+    var all = page.querySelectorAll('[data-mdx]');
+    Array.prototype.forEach.call(all, function (b) { b.disabled = true; });
+    box.hidden = false;
+    box.textContent = '';
+    box.appendChild(el('h5', null, WHAT[action] + ' is running. This takes up to a minute.'));
+    call(action, function (r) {
+      Array.prototype.forEach.call(all, function (b) { b.disabled = false; });
+      box.textContent = '';
+      var bad = (r.log || []).filter(function (i) { return !i.ok; }).length;
+      box.appendChild(el('h5', bad ? 'mdx-crit' : 'mdx-ok', bad ? WHAT[action] + ' finished with ' + bad + ' problem' + (bad === 1 ? '' : 's') + '.' : WHAT[action] + ' passed.'));
+      (r.log || []).forEach(function (i) { box.appendChild(line(i)); });
+      if (action !== 'check') status(page);
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('#mdx-page [data-mdx]');
+    if (!btn || btn.disabled) return;
+    var page = document.getElementById('mdx-page');
+    var action = btn.getAttribute('data-mdx');
+    // Remove needs a second click within 5 seconds
+    if (action === 'remove' && !btn.classList.contains('mdx-btn-armed')) {
+      btn.classList.add('mdx-btn-armed');
+      btn.textContent = 'Click to confirm';
+      setTimeout(function () { btn.classList.remove('mdx-btn-armed'); btn.textContent = 'Remove'; }, 5000);
+      return;
+    }
+    if (action === 'remove') { btn.classList.remove('mdx-btn-armed'); btn.textContent = 'Remove'; }
+    run(page, btn, action);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var box = document.getElementById('mdx-result');
+    if (box && !box.hidden) box.hidden = true;
+  });
+})();
+</script>

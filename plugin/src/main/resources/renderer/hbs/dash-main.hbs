@@ -1,0 +1,168 @@
+<div class="mdx" id="mdx-root" data-csrf-header="{{csrf.header}}" data-csrf-value="{{csrf.value}}">
+{{> hbs/styles}}
+<style>
+.mdx-row{display:grid;grid-template-columns:minmax(120px,1.2fr) 96px minmax(100px,1fr) 70px 90px 80px 90px 96px 80px 110px;gap:10px;align-items:center;padding:10px 12px;font-size:13px}
+.mdx-rowhead{color:var(--t-weak);font-size:12px;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--t-line)}
+.mdx details{border-bottom:1px solid var(--t-line)}
+.mdx details>summary{list-style:none;cursor:pointer}
+.mdx details>summary::-webkit-details-marker{display:none}
+.mdx details>summary:hover,.mdx details[open]>summary{background:var(--t-contrast)}
+.mdx-name{font-weight:600;color:var(--t-strong);display:flex;align-items:center;gap:8px;min-width:0}
+.mdx-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mdx-tag{display:inline-block;padding:1px 9px;border-radius:9999px;border:1px solid currentColor;font-size:12px;font-weight:600}
+.mdx-up{display:inline-flex;align-items:center;gap:6px}
+.mdx-detail{padding:14px 16px 16px;background:var(--t-contrast)}
+.mdx-facts{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 14px;font-size:13px}
+.mdx-facts b{color:var(--t-strong)}
+.mdx-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+.mdx-sub2{font-size:12px;color:var(--t-weak);text-transform:uppercase;letter-spacing:.03em;margin:14px 0 6px}
+.mdx-steps2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 24px}
+.mdx-step{display:grid;grid-template-columns:18px 12px minmax(0,1fr);gap:8px;align-items:center;font-size:12.5px;padding:3px 0}
+.mdx-step span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mdx-appr{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--t-line)}
+.mdx-appr:last-child{border-bottom:0}
+.mdx-bars{display:grid;grid-template-columns:130px minmax(0,1fr) 80px;gap:8px 12px;align-items:center;font-size:12.5px}
+.mdx-bars .mdx-track{height:16px;border-radius:4px;background:var(--t-contrast);overflow:hidden}
+.mdx-bars .mdx-track span{display:block;height:100%;background:var(--t-brand)}
+.mdx-meter{height:8px;border-radius:9999px;background:var(--t-contrast);overflow:hidden;margin-top:6px}
+.mdx-meter span{display:block;height:100%;background:var(--t-brand)}
+.mdx-host{display:grid;grid-template-columns:110px 70px minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--t-line);font-size:13px}
+.mdx-host:last-child{border-bottom:0}
+.mdx-flowlist li{padding:2px 0}
+.mdx-flowlist b{display:inline-block;min-width:110px}
+.mdx-act{display:grid;grid-template-columns:52px 14px minmax(180px,.9fr) minmax(0,2fr);gap:8px;align-items:center;height:32px;border-bottom:1px solid var(--t-line);font-size:13px}
+.mdx-act:last-child{border-bottom:0}
+.mdx-act>*{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdx-act-scroll{max-height:192px;overflow-y:auto;padding-right:4px}
+.mdx-scroll{overflow-x:auto}
+.mdx-scroll>div{min-width:980px}
+</style>
+
+<div class="mdx-head">
+  <h3>Demo Apps</h3>
+  <span class="mdx-sub">{{#if hvm.cluster}}Cluster {{hvm.cluster}} · {{/if}}Updated <span data-ms="{{updatedMs}}">{{updated}}</span></span>
+  <span class="mdx-spacer"></span>
+  {{#if links.order}}<a class="mdx-btn mdx-btn-primary" href="{{links.order}}">Order an app</a>{{/if}}
+  {{#if links.opsramp}}<a class="mdx-btn" href="{{links.opsramp}}" target="_blank" rel="noopener">Open OpsRamp</a>{{/if}}
+  <a class="mdx-btn" href="{{links.approvals}}">Approvals</a>
+</div>
+<div id="mdx-msg"></div>
+{{#each errors}}<div class="mdx-alert mdx-alert-error">{{this}}</div>{{/each}}
+{{#if setupMissing}}<div class="mdx-alert">The demo is not set up yet. Open Administration > Integrations > Morpheus Demo and press Set up.</div>{{/if}}
+
+{{#if kpi}}
+<div class="mdx-kpis">
+  <div class="mdx-kpi"><div class="mdx-kpi-label">Apps running</div><div class="mdx-kpi-value mdx-ok">{{kpi.running}}</div><div class="mdx-kpi-note">{{#if kpi.problems}}<span class="mdx-crit">{{kpi.problems}} with a problem</span>{{else}}{{#if kpi.running}}All healthy{{else}}None yet{{/if}}{{/if}}</div></div>
+  <div class="mdx-kpi"><div class="mdx-kpi-label">Being built</div><div class="mdx-kpi-value {{#if kpi.building}}mdx-info{{/if}}">{{kpi.building}}</div><div class="mdx-kpi-note">VMs and workflows</div></div>
+  <div class="mdx-kpi"><div class="mdx-kpi-label">Waiting for approval</div><div class="mdx-kpi-value {{#if kpi.waiting}}mdx-warn{{/if}}">{{kpi.waiting}}</div><div class="mdx-kpi-note">{{#if kpi.waiting}}See below{{else}}Nothing waiting{{/if}}</div></div>
+  <div class="mdx-kpi"><div class="mdx-kpi-label">VMs on HVM</div><div class="mdx-kpi-value">{{kpi.vms}}</div><div class="mdx-kpi-note">{{kpi.backups}} backups</div></div>
+  <div class="mdx-kpi"><div class="mdx-kpi-label">Cost per month</div><div class="mdx-kpi-value">{{kpi.cost}}</div><div class="mdx-kpi-note">From the Demo prices</div></div>
+  <div class="mdx-kpi"><div class="mdx-kpi-label">Open alerts</div><div class="mdx-kpi-value {{#if kpi.alerts}}mdx-crit{{else}}mdx-ok{{/if}}">{{kpi.alerts}}</div><div class="mdx-kpi-note">OpsRamp and Grafana</div></div>
+</div>
+{{/if}}
+
+{{#if approvals}}
+<div class="mdx-card">
+  <h4>Waiting for approval</h4>
+  {{#each approvals}}
+  <div class="mdx-appr">
+    <span class="mdx-name"><span>{{name}}</span></span>
+    <span>{{kind}}{{#if by}} by {{by}}{{/if}}</span>
+    <span class="mdx-muted">{{ago}}</span>
+    <span class="mdx-spacer"></span>
+    <button class="mdx-btn mdx-btn-primary" type="button" data-mdx-approve="{{itemId}}" data-do="approve">Approve</button>
+    <button class="mdx-btn mdx-btn-danger" type="button" data-mdx-approve="{{itemId}}" data-do="deny">Reject</button>
+  </div>
+  {{/each}}
+</div>
+{{/if}}
+
+<div class="mdx-card">
+  <h4>Apps</h4>
+  <div class="mdx-scroll"><div>
+  <div class="mdx-row mdx-rowhead"><span>App</span><span>Env</span><span>Owner</span><span>Size</span><span>Monitoring</span><span>Web</span><span>Database</span><span>Cost / month</span><span>Expires</span><span>Status</span></div>
+  {{#each apps}}
+  <details data-key="{{name}}">
+    <summary class="mdx-row">
+      <span class="mdx-name"><span>{{name}}</span></span>
+      <span><span class="mdx-tag" style="color:{{envColor}}">{{env}}</span></span>
+      <span>{{owner}}</span><span>{{size}}</span><span>{{monitoring}}</span>
+      <span class="mdx-up"><i class="mdx-dot mdx-dot-{{webCls}}"></i>{{webText}}</span>
+      <span class="mdx-up"><i class="mdx-dot mdx-dot-{{dbCls}}"></i>{{dbText}}</span>
+      <span>{{cost}}</span><span>{{expires}}</span>
+      <span class="mdx-{{stateClass}}">{{state}}{{#if alertText}} · {{alertText}}{{/if}}</span>
+    </summary>
+    <div class="mdx-detail">
+      <div class="mdx-facts">
+        <span>Cost owner <b>{{costOwner}}</b></span><span>Approver <b>{{costApprover}}</b></span><span>Cost ID <b>{{costId}}</b></span>
+        <span>Backup <b>{{backup}}</b></span><span>Backups made <b>{{backups}}</b></span><span>Ordered <b>{{created}}</b></span>
+        {{#if requests}}<span>Requests, 24 h <b>{{requests}}</b></span><span>Visitors <b>{{visitors}}</b></span>{{/if}}
+        {{#if email}}<span>Email <b>{{email}}</b></span>{{/if}}
+      </div>
+      {{#if reason}}<div class="mdx-alert">Why production: {{reason}}</div>{{/if}}
+      <table>
+        <thead><tr><th>Tier</th><th>VM</th><th>IP</th><th>Software</th><th>Plan</th><th>Cost / month</th><th>Status</th></tr></thead>
+        <tbody>{{#each tiers}}<tr><td>{{tier}}</td><td>{{name}}</td><td>{{ip}}</td><td>{{software}}</td><td>{{plan}}</td><td>{{cost}}</td><td class="mdx-{{statusClass}}">{{statusText}}</td></tr>{{/each}}</tbody>
+      </table>
+      {{#each tiers}}{{#if steps}}
+      <div class="mdx-sub2">Workflow on {{name}}</div>
+      <div class="mdx-steps2">{{#each steps}}<div class="mdx-step"><span class="mdx-muted">{{n}}</span><i class="mdx-dot mdx-dot-{{cls}}"></i><span title="{{text}}">{{text}}</span></div>{{/each}}</div>
+      {{/if}}{{/each}}
+      {{#if alerts}}
+      <div class="mdx-sub2">Open alerts</div>
+      {{#each alerts}}<div class="mdx-line"><i class="mdx-dot mdx-dot-bad"></i><b>{{subject}}</b><span class="mdx-muted">{{host}} · {{when}}</span></div>{{/each}}
+      {{/if}}
+      <div class="mdx-actions">
+        {{#if appUrl}}<a class="mdx-btn mdx-btn-primary" href="{{appUrl}}" target="_blank" rel="noopener">Open app</a>{{/if}}
+        {{#if monitoringUrl}}<a class="mdx-btn" href="{{monitoringUrl}}" target="_blank" rel="noopener">Open {{monitoring}}</a>{{/if}}
+        <a class="mdx-btn" href="/provisioning/apps/{{id}}">Open in Morpheus</a>
+        <span class="mdx-spacer"></span>
+        <button class="mdx-btn mdx-btn-danger" type="button" data-mdx-delete="{{id}}">Delete app</button>
+      </div>
+    </div>
+  </details>
+  {{else}}
+  <div class="mdx-row"><span class="mdx-muted" style="grid-column:1/-1">No demo apps yet. Use Order an app.</span></div>
+  {{/each}}
+  </div></div>
+</div>
+
+<div class="mdx-cols">
+  <div class="mdx-card">
+    <h4>Cost per month by cost owner</h4>
+    <div class="mdx-bars">{{#each costByOwner}}<span>{{name}}</span><span class="mdx-track"><span style="width:{{pct}}%"></span></span><b>{{cost}}</b>{{else}}<span class="mdx-muted">No apps yet.</span>{{/each}}</div>
+  </div>
+  <div class="mdx-card">
+    <h4>Cost per month by cost ID</h4>
+    <div class="mdx-bars">{{#each costById}}<span>{{name}}</span><span class="mdx-track"><span style="width:{{pct}}%;background:var(--t-info)"></span></span><b>{{cost}}</b>{{else}}<span class="mdx-muted">No apps yet.</span>{{/each}}</div>
+  </div>
+</div>
+
+<div class="mdx-cols">
+  <div class="mdx-card">
+    <h4>HVM hosts</h4>
+    {{#each hvm.hosts}}
+    <div class="mdx-host"><b>{{name}}</b><span class="{{#if ok}}mdx-ok{{else}}mdx-crit{{/if}}">{{status}}</span>
+      <span>CPU {{cpu}}%<div class="mdx-meter"><span style="width:{{cpu}}%"></span></div></span>
+      <span>Memory {{mem}}<div class="mdx-meter"><span style="width:{{memPct}}%"></span></div></span></div>
+    {{else}}<span class="mdx-muted">No HVM hosts found.</span>{{/each}}
+    {{#if hvm.datastore}}<div class="mdx-host"><b>{{hvm.datastore.name}}</b><span class="mdx-muted">storage</span><span style="grid-column:3/-1">{{hvm.datastore.text}}<div class="mdx-meter"><span style="width:{{hvm.datastore.pct}}%;background:var(--t-info)"></span></div></span></div>{{/if}}
+  </div>
+  <div class="mdx-card">
+    <h4>How an order is built</h4>
+    <ol class="mdx-steps mdx-flowlist">
+      <li><b>Catalog</b> 16 inputs, a live REST list, rules and help text</li>
+      <li><b>Approval</b> a policy on the Demo Apps group</li>
+      <li><b>Database VM</b> MariaDB, built first</li>
+      <li><b>Web VM</b> Apache and PHP, built second and wired to the database</li>
+      <li><b>Monitoring</b> OpsRamp or Grafana, from the same order</li>
+    </ol>
+    <p class="mdx-muted" style="margin:12px 0 0;font-size:12.5px">Prices, plans, tags, backups and an end date come from the same order.</p>
+  </div>
+</div>
+
+<div class="mdx-card">
+  <h4>Activity</h4>
+  <div class="mdx-act-scroll">{{#each activity}}<div class="mdx-act"><span class="mdx-muted" data-ms="{{ms}}">{{when}}</span><i class="mdx-dot mdx-dot-{{cls}}"></i><b>{{text}}</b><span class="mdx-muted" title="{{detail}}">{{detail}}</span></div>{{else}}<span class="mdx-muted">Nothing yet.</span>{{/each}}</div>
+</div>
+</div>

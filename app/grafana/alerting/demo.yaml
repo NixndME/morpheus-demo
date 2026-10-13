@@ -1,0 +1,85 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: demo-app
+    folder: Demo
+    interval: 10s
+    rules:
+      - uid: demo-db-down
+        title: Database down
+        condition: C
+        for: 20s
+        noDataState: Alerting
+        execErrState: Alerting
+        annotations:
+          summary: The database tier does not answer.
+        labels:
+          severity: critical
+        data:
+          - refId: A
+            datasourceUid: demo-prom
+            relativeTimeRange: { from: 60, to: 0 }
+            model:
+              refId: A
+              expr: min(mysql_up{job="mysql"}) or on() vector(0)
+              instant: true
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: lt, params: [1] }
+      - uid: demo-high-cpu
+        title: High CPU
+        condition: C
+        for: 30s
+        noDataState: OK
+        execErrState: OK
+        annotations:
+          summary: A VM uses more than 80% CPU.
+        labels:
+          severity: warning
+        data:
+          - refId: A
+            datasourceUid: demo-prom
+            relativeTimeRange: { from: 120, to: 0 }
+            model:
+              refId: A
+              expr: 100 - avg by (tier) (rate(node_cpu_seconds_total{mode="idle",job=~"web|db"}[1m])) * 100
+              instant: true
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [80] }
+      - uid: demo-high-memory
+        title: High memory
+        condition: C
+        for: 30s
+        noDataState: OK
+        execErrState: OK
+        annotations:
+          summary: A VM uses more than 85% of its memory.
+        labels:
+          severity: warning
+        data:
+          - refId: A
+            datasourceUid: demo-prom
+            relativeTimeRange: { from: 120, to: 0 }
+            model:
+              refId: A
+              expr: (1 - node_memory_MemAvailable_bytes{job=~"web|db"} / node_memory_MemTotal_bytes{job=~"web|db"}) * 100
+              instant: true
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [85] }

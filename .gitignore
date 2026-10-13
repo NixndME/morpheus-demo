@@ -1,0 +1,13 @@
+secrets/
+plugin/build/
+plugin/.gradle/
+.gradle/
+dist/
+*.class
+qa/screenshots/
+qa/video*/
+*.local.md
+lab/
+plugin/src/main/resources/demo/tasks/
+qa/browser/node_modules
+__pycache__/
