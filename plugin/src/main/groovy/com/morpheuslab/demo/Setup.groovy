@@ -327,7 +327,13 @@ Stop the database only on the VM whose name ends with **-db**. CPU and memory pr
         lines << [ok: env.layout != null, text: env.layout ? 'Ubuntu 24.04 layout' : 'Ubuntu 24.04 layout missing']
         objects().each { o -> lines << [ok: o.id != null, text: o.id ? "${o.name}" : "${o.name} missing"] }
         int set = CYPHER.count { settings[it[1]] } as int
-        lines << [ok: set == CYPHER.size(), text: set == CYPHER.size() ? 'OpsRamp settings filled in' : "OpsRamp settings: ${set} of ${CYPHER.size()} filled in"]
+        if (set < CYPHER.size()) {
+            lines << [ok: false, text: "OpsRamp settings: ${set} of ${CYPHER.size()} filled in"]
+        } else {
+            // the VMs read the agent keys from Cypher, which only Set up fills
+            boolean same = CYPHER.every { (api.get("/api/cypher/secret/${it[0]}").data as Map)?.value == settings[it[1]] }
+            lines << [ok: same, text: same ? 'OpsRamp settings filled in' : 'OpsRamp settings changed: press Set up to use them']
+        }
         lines
     }
 

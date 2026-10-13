@@ -6,7 +6,7 @@ A Morpheus plugin that sets up a ready to show demo on an HPE VM Essentials (HVM
 
 - Walkthrough video (23 min, waits sped up): [morpheus-demo-walkthrough.mp4](https://github.com/NixndME/morpheus-demo/releases/download/v0.1.28/morpheus-demo-walkthrough.mp4)
 - The same recording uncut (41 min): [morpheus-demo-full.mp4](https://github.com/NixndME/morpheus-demo/releases/download/v0.1.28/morpheus-demo-full.mp4)
-- Plugin: [morpheus-demo-plugin.jar](https://github.com/NixndME/morpheus-demo/releases/download/v0.1.28/morpheus-demo-plugin.jar)
+- Plugin: [morpheus-demo-plugin.jar](https://github.com/NixndME/morpheus-demo/releases/latest/download/morpheus-demo-plugin.jar)
 
 The video shows: upload the plugin, its settings, Set up, two orders from the catalog (one with OpsRamp, one with
 Grafana), the approval, the build, the app page, Grafana and OpsRamp, then a CPU spike, a stopped database and
@@ -54,18 +54,41 @@ When the database stops, the page turns red and says **Database down**.
 state, CPU, memory, queries and network. Alerts: **Database down** (within a minute when MariaDB stops),
 **High CPU** (over 80%) and **High memory** (over 85%).
 
-**OpsRamp**: the OpsRamp agent goes on both VMs. The plugin gives every VM the Linux OS monitoring template, so
-OpsRamp raises its own CPU and memory alerts, and makes a service map per app (web tier and database tier), so
-OpsRamp shows how the app is stacked. The plugin also checks every app every 30 seconds and raises **Database
-down** or **Web tier down** in OpsRamp, and clears it when the app is fine again. `qa/opsramp/build-dashboard.js` makes a new **Morpheus Demo** dashboard in OpsRamp; it
-never changes other dashboards.
+**OpsRamp**: uses your own OpsRamp account. The plugin has no OpsRamp details built in.
+
+How it connects:
+
+1. You fill in the plugin settings with your OpsRamp details (see Install).
+2. **Set up** copies the agent key, secret, API server and tenant into Morpheus Cypher. The task scripts read
+   them from there, so no key is written in a script.
+3. When an order picks OpsRamp, the **Demo OpsRamp Agent** task runs on both VMs. It gets a token from your
+   OpsRamp, downloads the Ubuntu agent, checks its checksum, installs it and registers it to your tenant.
+4. The plugin then uses the API key every 30 seconds: it gives every VM the Linux OS monitoring template (so
+   OpsRamp raises its own CPU and memory alerts), makes a service map per app (web tier and database tier),
+   raises and clears **Database down** and **Web tier down**, and reads the open alerts for the dashboard.
+5. Delete an app on the Demo Apps dashboard and its OpsRamp resources and service map go too.
+
+If you change the OpsRamp settings later, press **Set up** again. **Check** tells you when it is needed.
+
+An OpsRamp dashboard is optional. To make one, in OpsRamp go to Dashboards, create a new dashboard and add
+metric tiles with these queries:
+
+| Tile | Query |
+|---|---|
+| CPU used, % | `max by (name) (system_cpu_usage_utilization{name=~".+-(web\|db)"})` |
+| Memory used, % | `max by (name) (system_memory_usage_utilization{name=~".+-(web\|db)"})` |
+| Disk used, % | `max by (name) (system_disk_usage_utilization{name=~".+-(web\|db)"})` |
+
+Put its address in the plugin setting **OpsRamp dashboard address**, and the **Open OpsRamp** button opens it.
+Without it the button opens your OpsRamp home page.
 
 ## Install
 
 1. Download the jar from the releases page, or build it: `./build.sh` (JDK 17 and Gradle 8.5, the jar lands in `dist/`).
 2. Upload it in Administration > Integrations > Plugins.
-3. For OpsRamp, fill in the plugin settings: OpsRamp address, API server, tenant ID, agent key and secret, API key
-   and secret, and the address of the Morpheus Demo dashboard in OpsRamp.
+3. For OpsRamp, edit the plugin and fill in your OpsRamp address, API server, tenant ID, agent key and secret
+   (from the Linux agent install page in OpsRamp), API key and secret (an OpsRamp integration with API access),
+   and optionally a dashboard address. Grafana and None need no settings.
 4. Give your role the **Morpheus Demo** permission (full to set up, read to see the dashboard).
 5. Administration > Integrations > Add > **Morpheus Demo**, open it and press **Set up**.
 

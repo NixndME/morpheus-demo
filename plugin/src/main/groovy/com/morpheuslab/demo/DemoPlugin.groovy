@@ -48,7 +48,7 @@ class DemoPlugin extends Plugin {
          setting('OpsRamp agent secret', 'opsrampAgentSecret', 'From the Linux agent install page', OptionType.InputType.PASSWORD, 4),
          setting('OpsRamp API key', 'opsrampApiKey', 'For monitoring templates and alerts', OptionType.InputType.PASSWORD, 5),
          setting('OpsRamp API secret', 'opsrampApiSecret', 'For monitoring templates and alerts', OptionType.InputType.PASSWORD, 6),
-         setting('OpsRamp dashboard address', 'opsrampDashboardUrl', 'The Morpheus Demo dashboard in OpsRamp, for the Open OpsRamp button', OptionType.InputType.TEXT, 7)]
+         setting('OpsRamp dashboard address', 'opsrampDashboardUrl', 'Optional. An OpsRamp dashboard for the Open OpsRamp button', OptionType.InputType.TEXT, 7)]
     }
 
     private OptionType setting(String label, String field, String help, OptionType.InputType type, int order) {
